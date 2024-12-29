@@ -4,6 +4,7 @@ on:
  push:
   branches:
    - 'develop-zh'
+   - 'zh-v[1-9].[0-9]+.[0-9]+'
  release:
    types: [published]
 jobs:
@@ -20,11 +21,11 @@ jobs:
       - name: 添加BuildTag环境变量（push）
         if: ${{ github.event_name == 'push'}}
         run: |
-          echo "BUILD_TAG=-t ${BUILD_IMAGE}:${BUILD_VERSION} -t ${BUILD_IMAGE}:dev" >> $GITHUB_ENV
+          echo "BUILD_TAG=-t ${BUILD_IMAGE}:dev-${BUILD_VERSION} -t ${BUILD_IMAGE}:dev" >> $GITHUB_ENV
       - name: 添加BuildTag环境变量（release）
         if: ${{ github.event_name == 'release'}}
         run: |
-          echo "BUILD_TAG=-t ${BUILD_IMAGE}:${BUILD_VERSION} -t ${BUILD_IMAGE}:${BUILD_VERSION%.*} -t ${BUILD_IMAGE}:${BUILD_VERSION%.*.*} -t ${BUILD_IMAGE}:release" >> $GITHUB_ENV
+          echo "BUILD_TAG=-t ${BUILD_IMAGE}:${BUILD_VERSION} -t ${BUILD_IMAGE}:${BUILD_VERSION%.*} -t ${BUILD_IMAGE}:${BUILD_VERSION%.*.*} -t ${BUILD_IMAGE}:release -t ${BUILD_IMAGE}:latest" >> $GITHUB_ENV
       - name: 登录DockerHub账号
         env:
           DOCKER_USERNAME: ${{secrets.DOCKER_USERNAME}}
@@ -42,4 +43,3 @@ jobs:
         run: |
           chmod -R 755 scripts
           ./scripts/buildx-zh
-          
